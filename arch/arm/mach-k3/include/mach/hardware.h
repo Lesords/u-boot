@@ -86,6 +86,7 @@ static inline bool soc_is_##id(void) \
 }
 K3_SOC_ID(am62x, AM62X)
 K3_SOC_ID(am62ax, AM62AX)
+K3_SOC_ID(am62lx, AM62LX)
 K3_SOC_ID(am62px, AM62PX)
 K3_SOC_ID(am64x, AM64X)
 K3_SOC_ID(am65x, AM65X)
