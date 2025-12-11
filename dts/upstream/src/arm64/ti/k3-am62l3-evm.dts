@@ -19,7 +19,11 @@
 	aliases {
 		mmc0 = &sdhci0;
 		mmc1 = &sdhci1;
+		mmc2 = &sdhci2;
+		serial0 = &main_uart0;
 		serial3 = &main_uart1;
+		serial4 = &main_uart4;
+		serial5 = &main_uart5;
 	};
 
 	chosen {
@@ -27,24 +31,199 @@
 	};
 
     memory@80000000 {
-        reg = <0x00000000 0x80000000 0x00000000 0x10000000>;  /* 256MB */
+        reg = <0x00000000 0x80000000 0x00000000 0x10000000>;
 		device_type = "memory";
 		bootph-all;
 	};
 
-	leds {
+	led_matrix: led-matrix {
 		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&usr_led_pins_default>;
 
-		led-0 {
-			label = "am62-sk:green:heartbeat";
-			gpios = <&main_gpio0 123 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "heartbeat";
-			function = LED_FUNCTION_HEARTBEAT;
-			default-state = "on";
+		led-1-a {
+			label = "badge:matrix:led1_a";
+			gpios = <&led_gpio 0 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-b {
+			label = "badge:matrix:led1_b";
+			gpios = <&led_gpio 1 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-c {
+			label = "badge:matrix:led1_c";
+			gpios = <&led_gpio 2 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-d {
+			label = "badge:matrix:led1_d";
+			gpios = <&led_gpio 3 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-e {
+			label = "badge:matrix:led1_e";
+			gpios = <&led_gpio 4 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-f {
+			label = "badge:matrix:led1_f";
+			gpios = <&led_gpio 5 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-1-g {
+			label = "badge:matrix:led1_g";
+			gpios = <&led_gpio 6 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-a {
+			label = "badge:matrix:led2_a";
+			gpios = <&led_gpio 8 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-b {
+			label = "badge:matrix:led2_b";
+			gpios = <&led_gpio 9 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-c {
+			label = "badge:matrix:led2_c";
+			gpios = <&led_gpio 10 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-d {
+			label = "badge:matrix:led2_d";
+			gpios = <&led_gpio 11 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-e {
+			label = "badge:matrix:led2_e";
+			gpios = <&led_gpio 12 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-f {
+			label = "badge:matrix:led2_f";
+			gpios = <&led_gpio 13 GPIO_ACTIVE_LOW>;
+			default-state = "off";
+		};
+
+		led-2-g {
+			label = "badge:matrix:led2_g";
+			gpios = <&led_gpio 14 GPIO_ACTIVE_LOW>;
+			default-state = "off";
 		};
 	};
+
+	buttons {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&button_pins_default>;
+        status = "okay";
+
+		left {
+			label = "GPIO Key Left";
+			gpios = <&main_gpio0 31 0>;
+			linux,code = <KEY_LEFT>;
+		};
+
+		right {
+			label = "GPIO Key Right";
+			gpios = <&main_gpio0 95 0>;
+			linux,code = <KEY_RIGHT>;
+		};
+
+		down {
+			label = "GPIO Key Down";
+			gpios = <&main_gpio0 42 0>;
+			linux,code = <KEY_DOWN>;
+		};
+
+		up {
+			label = "GPIO Key Up";
+			gpios = <&main_gpio0 32 0>;
+			linux,code = <KEY_UP>;
+		};
+
+		back {
+			label = "GPIO Key Back";
+			gpios = <&main_gpio0 104 0>;
+			linux,code = <KEY_BACK>;
+		};
+
+		select {
+			label = "GPIO Key Select";
+			gpios = <&main_gpio0 26 0>;
+			linux,code = <KEY_SELECT>;
+		};
+	};
+
+	mikrobus-pwm {
+		#pwm-cells = <3>;
+		compatible = "pwm-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&mikrobus_pwm_pins_default>;
+		gpios = <&main_gpio0 33 GPIO_ACTIVE_HIGH>;
+	};
+
+	buzzer_pwm: buzzer-pwm {
+		#pwm-cells = <3>;
+		compatible = "pwm-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&buzzer_pins_default>;
+		gpios = <&main_gpio0 29 GPIO_ACTIVE_HIGH>;
+	};
+
+	badge-buzzer {
+        status = "disabled";
+		compatible = "pwm-beeper";
+		pwms = <&buzzer_pwm 0 50000 0>;
+	};
+
+    red-led {
+        compatible = "pwm-leds";
+        pinctrl-names = "default";
+        pinctrl-0 = <&red_led_pins_default>;
+
+        led-red {
+            label = "rgb:red";
+            pwms = <&ecap2 0 1000000 0>;
+            max-brightness = <255>;
+        };
+    };
+
+    green-led {
+        compatible = "pwm-leds";
+        pinctrl-names = "default";
+        pinctrl-0 = <&green_led_pins_default>;
+
+        led-green {
+            label = "rgb:green";
+            pwms = <&epwm1 0 1000000 0>;
+            max-brightness = <255>;
+        };
+    };
+
+    blue-led {
+        compatible = "pwm-leds";
+        pinctrl-names = "default";
+        pinctrl-0 = <&blue_led_pins_default>;
+
+        led-blue {
+            label = "rgb:blue";
+            pwms = <&epwm1 1 1000000 0>;
+            max-brightness = <255>;
+        };
+    };
 
 	vmain_pd: regulator-0 {
 		/* TPS65988 PD CONTROLLER OUTPUT */
@@ -91,6 +270,19 @@
 		regulator-always-on;
 		regulator-boot-on;
 	};
+
+	wifi_pwrseq: wifi-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		pinctrl-names = "default";
+		pinctrl-0 = <&wkup_clkout_pins_default>, <&main_wlirq_pins_default>,
+			<&wl_logger_pins_default>, <&wkup_ble_irq_pins_default>,
+			<&wifi_en_pins_default>;
+		reset-gpios = <&main_gpio0 51 GPIO_ACTIVE_LOW>;
+		post-power-on-delay-ms = <500>;
+		power-off-delay-us = <200>;
+		clocks = <&scmi_clk 471>;
+		clock-names = "ext_clock";
+	};
 };
 
 &pmx0 {
@@ -106,6 +298,8 @@
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0198, PIN_INPUT, 2)	/* (C11) UART1_RXD */
 			AM62LX_IOPAD(0x019c, PIN_OUTPUT, 2)	/* (A12) UART1_TXD */
+			AM62LX_IOPAD(0x0180, PIN_INPUT, 2)	/* (A8) UART1_CTSn */
+			AM62LX_IOPAD(0x0184, PIN_OUTPUT, 2)	/* (B10) UART1_RTSn */
 		>;
 		bootph-all;
 	};
@@ -154,7 +348,6 @@
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x003c, PIN_OUTPUT, 0) /* (D22) OSPI0_CLK */
 			AM62LX_IOPAD(0x0068, PIN_OUTPUT, 0) /* (C20) OSPI0_CSn0 */
-			AM62LX_IOPAD(0x0074, PIN_OUTPUT, 0) /* (C23) OSPI0_CSn3 */
 			AM62LX_IOPAD(0x0048, PIN_INPUT, 0) /* (C22) OSPI0_D0 */
 			AM62LX_IOPAD(0x004c, PIN_INPUT, 0) /* (D21) OSPI0_D1 */
 			AM62LX_IOPAD(0x0050, PIN_INPUT, 0) /* (E23) OSPI0_D2 */
@@ -164,18 +357,36 @@
 			AM62LX_IOPAD(0x0060, PIN_INPUT, 0) /* (G20) OSPI0_D6 */
 			AM62LX_IOPAD(0x0064, PIN_INPUT, 0) /* (F20) OSPI0_D7 */
 			AM62LX_IOPAD(0x0044, PIN_INPUT, 0) /* (E22) OSPI0_DQS */
-			AM62LX_IOPAD(0x0040, PIN_INPUT, 0) /* (E18) OSPI0_LBCLKO */
 		>;
 	};
+
+    ospi0_rst_pins_default: ospi0-rst-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x006c, PIN_OUTPUT, 7) /* (D20) OSPI0_RSTn.GPIO0_12 */
+        >;
+    };
+
+    ospi0_int_pins_default: ospi0-int-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x0070, PIN_INPUT, 7) /* (D18) OSPI0_INTn.GPIO0_13 */
+        >;
+    };
 
 	main_spi0_pins_default: main-spi0-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x01a8, PIN_OUTPUT, 0) /* (E13) SPI0_CLK */
-			AM62LX_IOPAD(0x01ac, PIN_OUTPUT, 0) /* (E12) SPI0_D0 */
 			AM62LX_IOPAD(0x01b0, PIN_OUTPUT, 0) /* (B12) SPI0_D1 */
 			AM62LX_IOPAD(0x01a0, PIN_OUTPUT, 0) /* (E11) SPI0_CS0 */
 		>;
 	};
+
+    main_spi0_other_pins: main-spi0-other-pins {
+        pinctrl-single,pins = <
+			AM62LX_IOPAD(0x01ac, PIN_OUTPUT, 7) /* (E12) D/C#.GPIO0_90 */
+			AM62LX_IOPAD(0x00dc, PIN_OUTPUT, 7) /* (N21) BUSY.GPIO0_39 */
+			AM62LX_IOPAD(0x009c, PIN_OUTPUT, 7) /* (H20) RES#.GPIO0_24 */
+        >;
+    };
 
 	main_spi1_pins_default: main-spi1-default-pins {
 		pinctrl-single,pins = <
@@ -190,18 +401,20 @@
 	main_spi3_pins_default: main-spi3-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x00d0, PIN_OUTPUT, 5) /* (P22) SPI3_CLK */
-			AM62LX_IOPAD(0x00d4, PIN_OUTPUT, 5) /* (N23) SPI3_D0 */
+			AM62LX_IOPAD(0x00d4, PIN_INPUT, 5) /* (N23) SPI3_D0 */
 			AM62LX_IOPAD(0x00d8, PIN_OUTPUT, 5) /* (N22) SPI3_D1 */
 			AM62LX_IOPAD(0x00cc, PIN_OUTPUT, 5) /* (P23) SPI3_CS0 */
 		>;
 	};
 
-	main_gpio0_ioexp_intr_pins_default: main-gpio0-ioexp-intr-default-pins {
-		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x01b0, PIN_INPUT, 7) /* (B12) SPI0_D1.GPIO0_91 */
-		>;
-		bootph-all;
-	};
+    lora_pins_default: lora-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x00e4, PIN_OUTPUT, 7) /* (L20) RF_SW1.GPIO0_41  */
+            AM62LX_IOPAD(0x00c8, PIN_OUTPUT, 7) /* (M19) NRST.GPIO0_34    */
+            AM62LX_IOPAD(0x01a4, PIN_INPUT, 7)  /* (D11) BUSY.GPIO0_88    */
+            AM62LX_IOPAD(0x01bc, PIN_INPUT, 7)  /* (B14) DIO.GPIO0_94     */
+        >;
+    };
 
 	usr_led_pins_default: usr-led-default-pins {
 		pinctrl-single,pins = <
@@ -211,29 +424,46 @@
 
     button_pins_default: button-default-pins {
         pinctrl-single,pins = <
-            AM62LX_IOPAD(0x00b8, PIN_INPUT, 7) /* (L21) Left.GPIO0_31  */
-            AM62LX_IOPAD(0x01c0, PIN_INPUT, 7) /* (B13) Right.GPIO0_95 */
-            AM62LX_IOPAD(0x00e8, PIN_INPUT, 7) /* (L19) Down.GPIO0_42  */
-            AM62LX_IOPAD(0x00c0, PIN_INPUT, 7) /* (N19) Up.GPIO0_32    */
-            AM62LX_IOPAD(0x01e4, PIN_INPUT, 7) /* (D16) Back.GPIO0_104 */
+            AM62LX_IOPAD(0x00b8, PIN_INPUT, 7) /* (L21) Left.GPIO0_31   */
+            AM62LX_IOPAD(0x01c0, PIN_INPUT, 7) /* (B13) Right.GPIO0_95  */
+            AM62LX_IOPAD(0x00e8, PIN_INPUT, 7) /* (L19) Down.GPIO0_42   */
+            AM62LX_IOPAD(0x00c0, PIN_INPUT, 7) /* (N19) Up.GPIO0_32     */
+            AM62LX_IOPAD(0x01e4, PIN_INPUT, 7) /* (D16) Back.GPIO0_104  */
+            AM62LX_IOPAD(0x00a4, PIN_INPUT, 7) /* (H18) Select.GPIO0_26 */
         >;
     };
 
     buzzer_pins_default: buzzer-default-pins {
         pinctrl-single,pins = <
-            AM62LX_IOPAD(0x00b0, PIN_OUTPUT, 4) /* (F22) Buzzer_PWM.GPIO0_29  */
+            AM62LX_IOPAD(0x00b0, PIN_OUTPUT, 7) /* (F22) Buzzer_PWM.GPIO0_29  */
         >;
     };
 
+    mikrobus_pwm_pins_default: mikrobus-pwm-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x00c4, PIN_OUTPUT, 7) /* (N20) Mikrobus_PWM.GPIO0_33  */
+        >;
+    };
+
+    mikrobus_rst_pins_default: mikrobus-rst-default-pins {
+        pinctrl-single,pins = <
+			AM62LX_IOPAD(0x0194, PIN_OUTPUT, 7) /* (B11) Mikrobus_RST.RST */
+        >;
+    };
     red_led_pins_default: red-led-default-pins {
         pinctrl-single,pins = <
             AM62LX_IOPAD(0x0190, PIN_OUTPUT, 2) /* (A11) RED.GPIO0_83   */
         >;
     };
 
-    rgb_led_pins_default: rgb-led-default-pins {
+    green_led_pins_default: green-led-default-pins {
         pinctrl-single,pins = <
             AM62LX_IOPAD(0x0188, PIN_OUTPUT, 5) /* (A9)  GREEN.GPIO0_81 */
+        >;
+    };
+
+    blue_led_pins_default: blue-led-default-pins {
+        pinctrl-single,pins = <
             AM62LX_IOPAD(0x018c, PIN_OUTPUT, 5) /* (B9)  BLUE.GPIO0_82  */
         >;
     };
@@ -254,6 +484,13 @@
 		bootph-all;
 	};
 
+	main_mmc0_rst_pins_default: main-mmc0-rst-pins-default {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x0040, PIN_OUTPUT, 7) /* (E18) OSPI0_LBCLKO.GPIO0_1 */
+		>;
+		bootph-all;
+	};
+
 	main_mmc1_pins_default: main-mmc1-default-pins {
 		pinctrl-single,pins = <
 			AM62LX_IOPAD(0x0230, PIN_INPUT, 0) /* (Y3) MMC1_CMD */
@@ -266,7 +503,7 @@
 		>;
 		bootph-all;
 	};
-    
+
     main_mmc1_ldd_pins_default: main-mmc1-ldd-pins-default {
         pinctrl-single,pins = <
             AM62LX_IOPAD(0x007c, PIN_OUTPUT, 7) /* (LDD) MMC1_LDD */
@@ -274,44 +511,77 @@
 		bootph-all;
     };
 
-	rgmii1_pins_default: rgmii1-default-pins {
+	main_mmc2_pins_default: main-mmc2-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x0138, PIN_INPUT, 0) /* (Y8) RGMII1_RD0 */
-			AM62LX_IOPAD(0x013c, PIN_INPUT, 0) /* (AA6) RGMII1_RD1 */
-			AM62LX_IOPAD(0x0140, PIN_INPUT, 0) /* (AA8) RGMII1_RD2 */
-			AM62LX_IOPAD(0x0144, PIN_INPUT, 0) /* (W8) RGMII1_RD3 */
-			AM62LX_IOPAD(0x0134, PIN_INPUT, 0) /* (Y7) RGMII1_RXC */
-			AM62LX_IOPAD(0x0130, PIN_INPUT, 0) /* (Y6) RGMII1_RX_CTL */
-			AM62LX_IOPAD(0x0120, PIN_OUTPUT, 0) /* (AC10) RGMII1_TD0 */
-			AM62LX_IOPAD(0x0124, PIN_OUTPUT, 0) /* (W13) RGMII1_TD1 */
-			AM62LX_IOPAD(0x0128, PIN_OUTPUT, 0) /* (Y11) RGMII1_TD2 */
-			AM62LX_IOPAD(0x012c, PIN_OUTPUT, 0) /* (AA11) RGMII1_TD3 */
-			AM62LX_IOPAD(0x011c, PIN_OUTPUT, 0) /* (W11) RGMII1_TXC */
-			AM62LX_IOPAD(0x0118, PIN_OUTPUT, 0) /* (AB11) RGMII1_TX_CTL */
+			AM62LX_IOPAD(0x010c, PIN_INPUT_PULLUP, 0)  /* (U23) MMC2_CMD */
+			AM62LX_IOPAD(0x0104, PIN_OUTPUT, 0) /* (R23) MMC2_CLK */
+			AM62LX_IOPAD(0x0108, PIN_INPUT, 0) /* () MMC2_CLKLB */
+			AM62LX_IOPAD(0x0100, PIN_INPUT_PULLUP, 0)  /* (U22) MMC2_DAT0 */
+			AM62LX_IOPAD(0x00fc, PIN_INPUT_PULLUP, 0)  /* (T22) MMC2_DAT1 */
+			AM62LX_IOPAD(0x00f8, PIN_INPUT_PULLUP, 0)  /* (T23) MMC2_DAT2 */
+			AM62LX_IOPAD(0x00f4, PIN_INPUT_PULLUP, 0)  /* (R22) MMC2_DAT3 */
 		>;
 	};
 
-	rgmii2_pins_default: rgmii2-default-pins {
+    wifi_en_pins_default: wifi-en-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x0110, PIN_OUTPUT, 7) /* (T20) WIFI_EN.GPIO0_51 */
+        >;
+    };
+
+	main_wlirq_pins_default: main-wlirq-pins-default {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x0170, PIN_INPUT, 0) /* (AB9) RGMII2_RD0 */
-			AM62LX_IOPAD(0x0174, PIN_INPUT, 0) /* (AC9) RGMII2_RD1 */
-			AM62LX_IOPAD(0x0178, PIN_INPUT, 0) /* (AB10) RGMII2_RD2 */
-			AM62LX_IOPAD(0x017c, PIN_INPUT, 0) /* (AB8) RGMII2_RD3 */
-			AM62LX_IOPAD(0x016c, PIN_INPUT, 0) /* (AC7) RGMII2_RXC */
-			AM62LX_IOPAD(0x0168, PIN_INPUT, 0) /* (AC8) RGMII2_RX_CTL */
-			AM62LX_IOPAD(0x0158, PIN_OUTPUT, 0) /* (AC12) RGMII2_TD0 */
-			AM62LX_IOPAD(0x015c, PIN_OUTPUT, 0) /* (AB13) RGMII2_TD1 */
-			AM62LX_IOPAD(0x0160, PIN_OUTPUT, 0) /* (AA12) RGMII2_TD2 */
-			AM62LX_IOPAD(0x0164, PIN_OUTPUT, 0) /* (AA13) RGMII2_TD3 */
-			AM62LX_IOPAD(0x0154, PIN_OUTPUT, 0) /* (Y13) RGMII2_TXC */
-			AM62LX_IOPAD(0x0150, PIN_OUTPUT, 0) /* (AB12) RGMII2_TX_CTL */
+			AM62LX_IOPAD(0x0114, PIN_INPUT_PULLDOWN, 7)    /* (T21) IRQ_WL.GPIO0_52 */
 		>;
 	};
 
-	mdio1_pins_default: mdio1-default-pins {
+	wl_logger_pins_default: wl-logger-default-pins {
 		pinctrl-single,pins = <
-			AM62LX_IOPAD(0x014c, PIN_OUTPUT, 0) /* (AC15) MDIO0_MDC */
-			AM62LX_IOPAD(0x0148, PIN_INPUT, 0) /* (AC13) MDIO0_MDIO */
+			AM62LX_IOPAD(0x0074, PIN_INPUT, 7) /* (C23) OSPI0_CSn3.GPIO0_14 */
+		>;
+	};
+
+	wkup_ble_irq_pins_default: wkup-ble-irq-default-pins {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x0008, PIN_INPUT_PULLDOWN, 7) /* WKUP_GPIO0_2 */
+		>;
+	};
+
+    wkup_clkout_pins_default: wkup-clkout-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x0018, PIN_OUTPUT, 0) /* (Y23) WKUP_CLKOUT */
+        >;
+    };
+    
+	others_gpio_pins_default: others-gpio-default-pins {
+		pinctrl-single,pins = <
+			AM62LX_IOPAD(0x0138, PIN_OUTPUT, 7) /* (Y8) RGMII1_RD0 */
+			AM62LX_IOPAD(0x013c, PIN_OUTPUT, 7) /* (AA6) RGMII1_RD1 */
+			AM62LX_IOPAD(0x0140, PIN_OUTPUT, 7) /* (AA8) RGMII1_RD2 */
+			AM62LX_IOPAD(0x0144, PIN_OUTPUT, 7) /* (W8) RGMII1_RD3 */
+			AM62LX_IOPAD(0x0134, PIN_OUTPUT, 7) /* (Y7) RGMII1_RXC */
+			AM62LX_IOPAD(0x0130, PIN_OUTPUT, 7) /* (Y6) RGMII1_RX_CTL */
+			AM62LX_IOPAD(0x0120, PIN_OUTPUT, 7) /* (AC10) RGMII1_TD0 */
+			AM62LX_IOPAD(0x0124, PIN_OUTPUT, 7) /* (W13) RGMII1_TD1 */
+			AM62LX_IOPAD(0x0128, PIN_OUTPUT, 7) /* (Y11) RGMII1_TD2 */
+			AM62LX_IOPAD(0x012c, PIN_OUTPUT, 7) /* (AA11) RGMII1_TD3 */
+			AM62LX_IOPAD(0x011c, PIN_OUTPUT, 7) /* (W11) RGMII1_TXC */
+			AM62LX_IOPAD(0x0118, PIN_OUTPUT, 7) /* (AB11) RGMII1_TX_CTL */
+
+			AM62LX_IOPAD(0x0170, PIN_OUTPUT, 7) /* (AB9) RGMII2_RD0 */
+			AM62LX_IOPAD(0x0174, PIN_OUTPUT, 7) /* (AC9) RGMII2_RD1 */
+			AM62LX_IOPAD(0x0178, PIN_OUTPUT, 7) /* (AB10) RGMII2_RD2 */
+			AM62LX_IOPAD(0x017c, PIN_OUTPUT, 7) /* (AB8) RGMII2_RD3 */
+			AM62LX_IOPAD(0x016c, PIN_OUTPUT, 7) /* (AC7) RGMII2_RXC */
+			AM62LX_IOPAD(0x0168, PIN_OUTPUT, 7) /* (AC8) RGMII2_RX_CTL */
+			AM62LX_IOPAD(0x0158, PIN_OUTPUT, 7) /* (AC12) RGMII2_TD0 */
+			AM62LX_IOPAD(0x015c, PIN_OUTPUT, 7) /* (AB13) RGMII2_TD1 */
+			AM62LX_IOPAD(0x0160, PIN_OUTPUT, 7) /* (AA12) RGMII2_TD2 */
+			AM62LX_IOPAD(0x0164, PIN_OUTPUT, 7) /* (AA13) RGMII2_TD3 */
+			AM62LX_IOPAD(0x0154, PIN_OUTPUT, 7) /* (Y13) RGMII2_TXC */
+			AM62LX_IOPAD(0x0150, PIN_OUTPUT, 7) /* (AB12) RGMII2_TX_CTL */
+			AM62LX_IOPAD(0x014c, PIN_OUTPUT, 7) /* (AC15) MDIO0_MDC */
+			AM62LX_IOPAD(0x0148, PIN_OUTPUT, 7) /* (AC13) MDIO0_MDIO */
 		>;
 	};
 
@@ -333,6 +603,12 @@
 			AM62LX_IOPAD(0x0014, PIN_INPUT_PULLUP, 0) /* (AA22) WKUP_I2C0_SDA */
 		>;
 	};
+
+    wkup_gpio0_pins_default: wkup-gpio0-default-pins {
+        pinctrl-single,pins = <
+            AM62LX_IOPAD(0x0004, PIN_OUTPUT, 7) /* (AA23) WKUP_GPIO0_1 */
+        >;
+	};
 };
 
 &main_uart0 {
@@ -345,6 +621,27 @@
 &main_uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart1_pins_default>;
+	status = "okay";
+	bootph-all;
+
+	bluetooth {
+		compatible = "ti,cc33xx-bt";
+		cc33xx-supply = <&vcc_3v3_sys>;
+		max-speed = <115200>;
+	};
+};
+
+&main_uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_uart4_pins_default>;
+	status = "okay";
+	bootph-all;
+};
+
+&main_uart5 {
+	symlink = "badge/mikrobus/uart";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_uart5_pins_default>;
 	status = "okay";
 	bootph-all;
 };
@@ -360,7 +657,7 @@
      * TODO: ePaper Conn
      */
     spidev@0 {
-        compatible = "spidev";
+        compatible = "rohm,dh2228fv";
         reg = <0>;
         #address-cells = <1>;
         #size-cells = <0>;
@@ -374,9 +671,10 @@
     pinctrl-names = "default";
     pinctrl-0 = <&main_spi1_pins_default>;
     status = "okay";
-	#address-cells = <1>;
-	#size-cells = <0>;
-	ti,spi-num-cs = <2>;
+    #address-cells = <1>;
+    #size-cells = <0>;
+    ti,spi-num-cs = <2>;
+    ti,pindir-d1-out-d0-in;
 
     led_gpio: led-gpio@0 {
         compatible = "microchip,mcp23s18";
@@ -393,10 +691,8 @@
     };
 
     spidev@1 {
-        compatible = "spidev";
+        compatible = "rohm,dh2228fv";
         reg = <1>;
-        #address-cells = <1>;
-        #size-cells = <0>;
         spi-max-frequency = <125000000>;
         symlink = "spi/1.1";
         status = "okay";
@@ -410,9 +706,10 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	ti,spi-num-cs = <1>;
+    ti,pindir-d1-out-d0-in;
 
     spidev@0 {
-        compatible = "spidev";
+        compatible = "rohm,dh2228fv";
         reg = <0>;
         #address-cells = <1>;
         #size-cells = <0>;
@@ -426,7 +723,7 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c0_pins_default>;
-	clock-frequency = <400000>;
+	clock-frequency = <100000>;
 	bootph-all;
 
     /*
@@ -437,10 +734,11 @@
         reg = <0x50>;
     };
 
-    // IMU Sensor don't need interrupt pin, use ext_wakeup1
 	lsm6ds3@6a {
-		compatible = "st,lsm6ds3";
+		compatible = "st,lsm6ds3tr-c";
 		reg = <0x6a>;
+        vdd-supply = <&vcc_3v3_sys>;
+        vddio-supply = <&vcc_3v3_sys>;
 	};
 };
 
@@ -528,6 +826,8 @@
 &main_gpio0 {
 	status = "okay";
 	bootph-all;
+	pinctrl-names = "default";
+	pinctrl-0 = <&others_gpio_pins_default>, <&lora_pins_default>, <&main_spi0_other_pins>, <&mikrobus_rst_pins_default>;
 };
 
 &main_gpio2 {
@@ -535,11 +835,19 @@
 	bootph-all;
 };
 
+&wkup_gpio0 {
+    status = "okay";
+    bootph-all;
+	pinctrl-names = "default";
+	pinctrl-0 = <&wkup_gpio0_pins_default>;
+};
+
 &sdhci0 {
 	/* eMMC */
 	non-removable;
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_mmc0_pins_default>;
+	pinctrl-0 = <&main_mmc0_pins_default>, <&main_mmc0_rst_pins_default>;
+	reset-gpios = <&main_gpio0 1 GPIO_ACTIVE_LOW>;
 	status = "okay";
 	bootph-all;
 };
@@ -554,11 +862,42 @@
 	disable-wp;
 };
 
+&sdhci2 {
+	compatible = "ti,j721e-sdhci-4bit";
+	bootph-all;
+	vmmc-supply = <&vcc_3v3_sys>;
+	vqmmc-supply = <&vcc_1v8>;
+	mmc-pwrseq = <&wifi_pwrseq>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_mmc2_pins_default>;
+	bus-width = <4>;
+	non-removable;
+	ti,fails-without-test-cd;
+	cap-power-off-card;
+	keep-power-in-suspend;
+	ti,driver-strength-ohm = <50>;
+
+	assigned-clocks = <&scmi_clk 471>;
+	assigned-clock-parents = <&scmi_clk 468>;
+	assigned-clock-rates = <32768>;
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	wlcore: wlcore@2 {
+		compatible = "ti,cc3300";
+		reg = <2>;
+		interrupt-parent = <&main_gpio0>;
+		interrupts = <52 IRQ_TYPE_EDGE_RISING>;
+	};
+};
+
 &ospi0 {
 	bootph-all;
 	status = "okay";
 	pinctrl-names = "default";
-	pinctrl-0 = <&ospi0_pins_default>;
+	pinctrl-0 = <&ospi0_pins_default>, <&ospi0_rst_pins_default>, <&ospi0_int_pins_default>;
 
 	ospi0_nor: flash@0 {
 		bootph-all;
@@ -566,13 +905,12 @@
 		reg = <0x0>;
 		spi-tx-bus-width = <8>;
 		spi-rx-bus-width = <8>;
-		spi-max-frequency = <25000000>;
+		spi-max-frequency = <160000000>;
 		cdns,tshsl-ns = <60>;
 		cdns,tsd2d-ns = <60>;
 		cdns,tchsh-ns = <60>;
 		cdns,tslch-ns = <60>;
-		cdns,read-delay = <4>;
-		cdns,phy-mode;
+		cdns,read-delay = <3>;
 
 		partitions {
 			bootph-all;
@@ -605,26 +943,38 @@
 				reg = <0x6c0000 0x40000>;
 			};
 
-			partition@800000 {
-				label = "ospi.rootfs";
-				reg = <0x800000 0x37c0000>;
-			};
+            partition@700000 {
+                label = "ospi.rootfs";
+                reg = <0x700000 0x18c0000>;
+            };
 
-			partition@3fc0000 {
-				bootph-all;
-				label = "ospi.phypattern";
-				reg = <0x3fc0000 0x40000>;
-			};
-		};
-	};
+            partition@1fc0000 {
+                bootph-all;
+                label = "ospi.phypattern";
+                reg = <0x1fc0000 0x40000>;
+            };
+        };
+    };
 };
 
 &tscadc0 {
 	status = "okay";
 
 	adc {
-		ti,adc-channels = <1 2>;
+		ti,adc-channels = <0 1 2 3>;
 	};
+};
+
+&cpsw3g {
+    status = "disabled";
+};
+
+&epwm1 {
+	status = "okay";
+};
+
+&ecap2 {
+    status = "okay";
 };
 
 &usbss0 {
